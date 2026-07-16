@@ -90,14 +90,38 @@ select = [
     "SIM",       # simplify
     "RUF",
 ]
-ignore = ["S101"]  # allow assert in tests
+ignore = [
+    "S101",   # allow assert in tests
+    "UP046",  # PEP 695 generic classes — kept as Generic[T] for pydantic-generic clarity
+    "UP047",  # PEP 695 generic functions — same rationale
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "ARG"]
 "app/db/migrations/**" = ["E501", "I"]
+"app/core/config.py" = ["N802"]              # computed settings fields use SCREAMING_CASE by convention
+"app/core/exceptions.py" = ["N818"]          # AppException is the intentional base-class name
+"app/modules/auth/schemas.py" = ["S105"]     # token_type="bearer" is a scheme name, not a secret
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
+
+# Depends()/require_permissions() in argument defaults is the idiomatic FastAPI
+# dependency-injection pattern — not a bugbear B008 violation.
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Security",
+    "app.api.deps.auth.require_permissions",
+    "app.api.deps.require_permissions",
+]
 
 # --------------------------------------------------------------------------- #
 # Black — opinionated formatter (Ruff handles lint; Black owns formatting)
