@@ -4,7 +4,7 @@ A single engine (and its connection pool) lives for the lifetime of the process.
 `AsyncSessionLocal` produces short-lived sessions — one per request or per task.
 
 Pool sizing matters in production: total Postgres connections ≈
-(DB_POOL_SIZE + DB_MAX_OVERFLOW) × number_of_app_processes. Keep that under the
+(DB_POOL_SIZE + DB_MAX_OVERFLOW) x number_of_app_processes. Keep that under the
 Postgres `max_connections` (use PgBouncer in front for large fleets).
 """
 

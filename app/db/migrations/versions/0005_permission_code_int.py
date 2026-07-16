@@ -37,7 +37,7 @@ _ACTION = {1: "create", 2: "read", 3: "update", 4: "delete"}
 def upgrade() -> None:
     # resource and action are already SMALLINT, so the integer code is just math.
     op.execute(
-        "ALTER TABLE permissions ALTER COLUMN code TYPE integer " "USING (resource * 10 + action)"
+        "ALTER TABLE permissions ALTER COLUMN code TYPE integer USING (resource * 10 + action)"
     )
 
 
