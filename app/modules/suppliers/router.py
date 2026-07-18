@@ -73,6 +73,6 @@ async def delete_supplier(
     supplier_id: int,
     service: SupplierService = Depends(get_service),
     _: CurrentUser = require_permissions("suppliers:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(supplier_id)
     return ok({"detail": "Supplier deleted."})

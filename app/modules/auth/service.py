@@ -9,6 +9,7 @@ domain exceptions — it never touches FastAPI request/response objects.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from app.common.enums import AuthProvider, UserStatus
 from app.core.config import settings
@@ -91,7 +92,7 @@ class AuthService:
 
     async def _register_failed_attempt(self, user: User) -> None:
         attempts = user.failed_login_attempts + 1
-        updates: dict = {"failed_login_attempts": attempts}
+        updates: dict[str, Any] = {"failed_login_attempts": attempts}
         if attempts >= settings.ACCOUNT_LOCKOUT_MAX_ATTEMPTS:
             updates["locked_until"] = datetime.now(UTC) + timedelta(
                 minutes=settings.ACCOUNT_LOCKOUT_DURATION_MINUTES

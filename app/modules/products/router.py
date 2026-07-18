@@ -73,6 +73,6 @@ async def delete_product(
     product_id: int,
     service: ProductService = Depends(get_service),
     _: CurrentUser = require_permissions("products:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(product_id)
     return ok({"detail": "Product deleted."})

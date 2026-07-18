@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from types import TracebackType
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.session import AsyncSessionLocal
 
@@ -27,7 +27,9 @@ class UnitOfWork:
 
     session: AsyncSession
 
-    def __init__(self, session_factory=AsyncSessionLocal) -> None:
+    def __init__(
+        self, session_factory: async_sessionmaker[AsyncSession] = AsyncSessionLocal
+    ) -> None:
         self._session_factory = session_factory
 
     async def __aenter__(self) -> UnitOfWork:

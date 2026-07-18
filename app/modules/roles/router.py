@@ -74,6 +74,6 @@ async def delete_role(
     role_id: int,
     service: RoleService = Depends(get_service),
     _: CurrentUser = require_permissions("roles:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(role_id)
     return ok({"detail": "Role deleted."})

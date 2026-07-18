@@ -13,12 +13,12 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from redis.asyncio import Redis
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.exceptions import TokenRevokedError
+from app.core.redis import RedisClient
 from app.core.security import create_access_token, create_refresh_token
 from app.modules.auth.models import RefreshToken
 from app.modules.auth.schemas import TokenPair
@@ -27,7 +27,7 @@ DENYLIST_PREFIX = "denylist:jti:"
 
 
 class TokenService:
-    def __init__(self, session: AsyncSession, redis: Redis) -> None:
+    def __init__(self, session: AsyncSession, redis: RedisClient) -> None:
         self.session = session
         self.redis = redis
 
@@ -35,7 +35,7 @@ class TokenService:
     async def issue_pair(
         self,
         user_id: int,
-        permissions: set[str],
+        permissions: set[int],
         family_id: uuid.UUID | None = None,
         device_id: int | None = None,
     ) -> TokenPair:
@@ -65,7 +65,7 @@ class TokenService:
         )
 
     # --- rotate (with reuse detection) ------------------------------------ #
-    async def rotate(self, refresh_jti: str, user_id: int, permissions: set[str]) -> TokenPair:
+    async def rotate(self, refresh_jti: str, user_id: int, permissions: set[int]) -> TokenPair:
         record = (
             await self.session.execute(select(RefreshToken).where(RefreshToken.jti == refresh_jti))
         ).scalar_one_or_none()

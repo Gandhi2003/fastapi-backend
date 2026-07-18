@@ -6,6 +6,8 @@ transient SMTP failures. The web layer only enqueues — it never blocks on SMTP
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 from app.core.logging import get_logger
 from app.workers.celery_app import celery_app
 
@@ -20,7 +22,7 @@ logger = get_logger(__name__)
     retry_backoff=True,
     retry_jitter=True,
 )
-def send_email(self, to: str, subject: str, body: str) -> dict:
+def send_email(self: Any, to: str, subject: str, body: str) -> dict[str, str]:
     """Send a transactional email via SMTP. Replace body with a real SMTP call."""
     logger.info("send_email", to=to, subject=subject, attempt=self.request.retries)
     # smtplib / aiosmtplib call goes here.
@@ -28,6 +30,9 @@ def send_email(self, to: str, subject: str, body: str) -> dict:
 
 
 @celery_app.task
-def send_verification_email(to: str, token: str) -> dict:
+def send_verification_email(to: str, token: str) -> dict[str, str]:
     link = f"https://app.wealthified.in/verify-email?token={token}"
-    return send_email.run(to, "Verify your email", f"Click to verify: {link}")
+    return cast(
+        "dict[str, str]",
+        send_email.run(to, "Verify your email", f"Click to verify: {link}"),
+    )

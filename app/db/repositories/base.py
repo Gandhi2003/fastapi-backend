@@ -36,7 +36,7 @@ class BaseRepository(Generic[ModelT]):
     def _base_query(self, include_deleted: bool = False) -> Select[tuple[ModelT]]:
         stmt = select(self.model)
         if issubclass(self.model, SoftDeleteMixin) and not include_deleted:
-            stmt = stmt.where(self.model.deleted_at.is_(None))  # type: ignore[attr-defined]
+            stmt = stmt.where(self.model.deleted_at.is_(None))
         return stmt
 
     def _apply_filters(
@@ -109,7 +109,7 @@ class BaseRepository(Generic[ModelT]):
     async def soft_delete(self, instance: ModelT) -> None:
         if not isinstance(instance, SoftDeleteMixin):
             raise TypeError(f"{self.model.__name__} does not support soft delete")
-        instance.deleted_at = func.now()  # type: ignore[assignment]
+        instance.deleted_at = func.now()
         await self.session.flush()
 
     async def hard_delete(self, instance: ModelT) -> None:

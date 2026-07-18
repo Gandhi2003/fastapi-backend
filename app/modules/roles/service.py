@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import builtins
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.schemas.pagination import Page, PageParams
 from app.core.exceptions import BadRequestError, ConflictError, NotFoundError
+from app.modules.permissions.models import Permission
 from app.modules.permissions.repository import PermissionRepository
 from app.modules.roles.models import Role
 from app.modules.roles.repository import RoleRepository
@@ -67,7 +70,9 @@ class RoleService:
         await self.session.commit()
 
     # --- helpers ---------------------------------------------------------- #
-    async def _resolve_permissions(self, permission_ids: list[int]) -> list:
+    async def _resolve_permissions(
+        self, permission_ids: builtins.list[int]
+    ) -> builtins.list[Permission]:
         if not permission_ids:
             return []
         perms = await self.permissions.get_many_by_ids(permission_ids)

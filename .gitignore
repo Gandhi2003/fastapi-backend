@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -7,26 +6,21 @@ build/
 dist/
 .venv/
 venv/
-
-# Env & secrets
 .env
 .env.*
-!.env.example
+env.celery.prod
 keys/
 *.pem
-
-# Test / coverage
 .pytest_cache/
 .coverage
 coverage.xml
+.remember/
 htmlcov/
 .mypy_cache/
 .ruff_cache/
-
-# IDE / OS
 .idea/
 .vscode/
 .DS_Store
-
-# Docker volumes (local)
 .data/
+logs/
+*.log

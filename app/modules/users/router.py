@@ -74,6 +74,6 @@ async def delete_user(
     user_id: int,
     service: UserService = Depends(get_service),
     _: CurrentUser = require_permissions("users:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(user_id)
     return ok({"detail": "User deleted."})

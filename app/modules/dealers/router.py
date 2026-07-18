@@ -73,6 +73,6 @@ async def delete_dealer(
     dealer_id: int,
     service: DealerService = Depends(get_service),
     _: CurrentUser = require_permissions("dealers:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(dealer_id)
     return ok({"detail": "Dealer deleted."})

@@ -19,6 +19,6 @@ class UserRepository(BaseRepository[User]):
         )
         return (await self.session.execute(stmt)).scalar_one_or_none()
 
-    async def get_with_roles(self, user_id) -> User | None:
+    async def get_with_roles(self, user_id: int) -> User | None:
         stmt = self._base_query().where(User.id == user_id).options(selectinload(User.roles))
         return (await self.session.execute(stmt)).scalar_one_or_none()

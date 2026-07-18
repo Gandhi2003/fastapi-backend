@@ -7,6 +7,7 @@ are activated and email-verified immediately so they can sign in.
 
 from __future__ import annotations
 
+import builtins
 from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +16,7 @@ from app.common.enums import AuthProvider
 from app.common.schemas.pagination import Page, PageParams
 from app.core.exceptions import BadRequestError, ConflictError, NotFoundError
 from app.core.security import hash_password
+from app.modules.roles.models import Role
 from app.modules.roles.repository import RoleRepository
 from app.modules.users.models import User
 from app.modules.users.repository import UserRepository
@@ -85,7 +87,7 @@ class UserService:
         await self.session.commit()
 
     # --- helpers ---------------------------------------------------------- #
-    async def _resolve_roles(self, role_ids: list[int]) -> list:
+    async def _resolve_roles(self, role_ids: builtins.list[int]) -> builtins.list[Role]:
         if not role_ids:
             return []
         roles = await self.roles.get_many_by_ids(role_ids)

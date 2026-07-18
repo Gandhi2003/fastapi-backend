@@ -11,16 +11,17 @@ thin and makes every dependency individually overridable in tests.
 
 from __future__ import annotations
 
+from typing import Any
+
 import jwt
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps.database import db_session
 from app.common.enums import parse_permission_code
 from app.core.exceptions import AuthenticationError, PermissionDeniedError, TokenRevokedError
-from app.core.redis import get_redis
+from app.core.redis import RedisClient, get_redis
 from app.core.security import decode_token
 from app.modules.auth.schemas import CurrentUser
 from app.modules.auth.service import AuthService
@@ -37,7 +38,7 @@ def get_user_repository(session: AsyncSession = Depends(db_session)) -> UserRepo
 
 def get_token_service(
     session: AsyncSession = Depends(db_session),
-    redis: Redis = Depends(get_redis),
+    redis: RedisClient = Depends(get_redis),
 ) -> TokenService:
     return TokenService(session, redis)
 
@@ -88,7 +89,7 @@ async def get_current_user(
 
 
 # --- permission enforcement (RBAC + permission-based) ---------------------- #
-def require_permissions(*required: str) -> object:
+def require_permissions(*required: str) -> Any:
     """Dependency factory enforcing that the caller holds ALL given permissions.
 
     Routes declare permissions with readable strings (``"customers:create"``);

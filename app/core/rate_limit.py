@@ -11,10 +11,9 @@ Usage in a router:
 from __future__ import annotations
 
 from fastapi import Depends, Request
-from redis.asyncio import Redis
 
 from app.core.exceptions import RateLimitError
-from app.core.redis import get_redis
+from app.core.redis import RedisClient, get_redis
 
 
 class RateLimiter:
@@ -22,7 +21,7 @@ class RateLimiter:
         self.times = times
         self.seconds = seconds
 
-    async def __call__(self, request: Request, redis: Redis = Depends(get_redis)) -> None:
+    async def __call__(self, request: Request, redis: RedisClient = Depends(get_redis)) -> None:
         client = request.client.host if request.client else "anonymous"
         key = f"ratelimit:{client}:{request.url.path}"
         # INCR + first-hit EXPIRE = atomic fixed window.

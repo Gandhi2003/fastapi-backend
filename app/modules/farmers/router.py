@@ -73,6 +73,6 @@ async def delete_farmer(
     farmer_id: int,
     service: FarmerService = Depends(get_service),
     _: CurrentUser = require_permissions("farmers:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(farmer_id)
     return ok({"detail": "Farmer deleted."})

@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 def _envelope(
     status_code: int, code: str, message: str, request: Request, details: object = None
 ) -> JSONResponse:
-    payload = ResponseEnvelope(
+    payload: ResponseEnvelope[None] = ResponseEnvelope(
         success=False,
         error=ErrorDetail(code=code, message=message, details=details),
         meta=Meta(request_id=getattr(request.state, "request_id", None)),

@@ -8,28 +8,27 @@ Separating the two prevents a transient DB blip from killing healthy pods.
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
-from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps.database import db_session
 from app.common.schemas.response import ResponseEnvelope, ok
 from app.core.config import settings
-from app.core.redis import get_redis
+from app.core.redis import RedisClient, get_redis
 
 router = APIRouter(prefix="/health", tags=["Health"])
 
 
 @router.get("/live")
-async def liveness() -> ResponseEnvelope[dict]:
+async def liveness() -> ResponseEnvelope[dict[str, str]]:
     return ok({"status": "alive", "app": settings.APP_NAME, "env": settings.ENVIRONMENT})
 
 
 @router.get("/ready")
 async def readiness(
     session: AsyncSession = Depends(db_session),
-    redis: Redis = Depends(get_redis),
-) -> ResponseEnvelope[dict]:
+    redis: RedisClient = Depends(get_redis),
+) -> ResponseEnvelope[dict[str, object]]:
     checks: dict[str, str] = {}
     try:
         await session.execute(text("SELECT 1"))

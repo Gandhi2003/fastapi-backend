@@ -77,6 +77,6 @@ async def delete_customer(
     customer_id: int,
     service: CustomerService = Depends(get_service),
     _: CurrentUser = require_permissions("customers:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(customer_id)
     return ok({"detail": "Customer deleted."})

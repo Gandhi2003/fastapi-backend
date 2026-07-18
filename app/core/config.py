@@ -91,6 +91,11 @@ class Settings(BaseSettings):
     # --- Observability ---
     LOG_LEVEL: str = "INFO"
     LOG_JSON: bool = True
+    # File logging. Set LOG_FILE="" to log to stdout only (e.g. on Kubernetes,
+    # where the platform collects stdout). The directory is created on startup.
+    LOG_FILE: str = "logs/api.log"
+    LOG_FILE_MAX_BYTES: int = 10 * 1024 * 1024  # rotate at 10 MB
+    LOG_FILE_BACKUP_COUNT: int = 5  # keep api.log + 5 rotated copies
     SENTRY_DSN: str = ""
     PROMETHEUS_ENABLED: bool = True
 
@@ -152,7 +157,7 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Cached accessor — instantiate once per process."""
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = get_settings()

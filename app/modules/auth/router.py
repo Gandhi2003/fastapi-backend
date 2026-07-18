@@ -33,7 +33,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 async def register(
     payload: RegisterRequest,
     service: AuthService = Depends(get_auth_service),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     user = await service.register(payload)
     return ok({"id": str(user.id), "email": user.email, "status": user.status})
 
@@ -71,7 +71,7 @@ async def logout(
     request: Request,
     tokens: TokenService = Depends(get_token_service),
     _: CurrentUser = Depends(get_current_user),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     # Denylist the presented access token immediately.
     auth_header = request.headers.get("authorization", "")
     token = auth_header.removeprefix("Bearer ").strip()

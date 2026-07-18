@@ -73,6 +73,6 @@ async def delete_category(
     category_id: int,
     service: CategoryService = Depends(get_service),
     _: CurrentUser = require_permissions("categories:delete"),
-) -> ResponseEnvelope[dict]:
+) -> ResponseEnvelope[dict[str, str]]:
     await service.delete(category_id)
     return ok({"detail": "Category deleted."})
