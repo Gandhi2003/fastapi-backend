@@ -124,6 +124,9 @@ warn_return_any = true
 warn_unused_ignores = true
 ignore_missing_imports = true
 exclude = ["app/db/migrations/"]
+# Pydantic's @computed_field sits on top of @property; mypy>=1.12 flags this
+# valid pattern with prop-decorator. Disable that single false-positive code.
+disable_error_code = ["prop-decorator"]
 
 [[tool.mypy.overrides]]
 module = "app.workers.*"
