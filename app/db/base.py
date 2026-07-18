@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
 
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
@@ -14,3 +19,6 @@ NAMING_CONVENTION = {
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
+
+    if TYPE_CHECKING:
+        id: Mapped[int]
