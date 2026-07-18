@@ -1,5 +1,3 @@
-"""Product repository — generic CRUD plus a name/SKU search."""
-
 from __future__ import annotations
 
 from sqlalchemy import func, or_, select

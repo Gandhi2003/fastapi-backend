@@ -1,13 +1,3 @@
-"""Token lifecycle: issue, rotate, revoke, verify against the Redis denylist.
-
-Two layers of revocation:
-  1. Redis denylist (fast path): the access token's ``jti`` is checked on every
-     request. Logout / "revoke device" adds the jti with a TTL == remaining
-     token lifetime, so a 15-minute access token is killable instantly.
-  2. Postgres refresh-token table (durable): supports rotation + reuse detection
-     and survives a Redis flush.
-"""
-
 from __future__ import annotations
 
 import uuid
@@ -31,7 +21,6 @@ class TokenService:
         self.session = session
         self.redis = redis
 
-    # --- issue ------------------------------------------------------------ #
     async def issue_pair(
         self,
         user_id: int,
@@ -64,7 +53,6 @@ class TokenService:
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
 
-    # --- rotate (with reuse detection) ------------------------------------ #
     async def rotate(self, refresh_jti: str, user_id: int, permissions: set[int]) -> TokenPair:
         record = (
             await self.session.execute(select(RefreshToken).where(RefreshToken.jti == refresh_jti))
@@ -74,7 +62,6 @@ class TokenService:
             raise TokenRevokedError("Refresh token is not valid.")
 
         if record.rotated:
-            # Reuse of an already-rotated token → token theft. Burn the family.
             await self._revoke_family(record.family_id)
             raise TokenRevokedError("Refresh token reuse detected; all sessions revoked.")
 
@@ -88,7 +75,6 @@ class TokenService:
             device_id=record.device_id,
         )
 
-    # --- revoke ----------------------------------------------------------- #
     async def revoke_access_jti(self, jti: str, expires_at: datetime) -> None:
         ttl = max(1, int((expires_at - datetime.now(UTC)).total_seconds()))
         await self.redis.set(f"{DENYLIST_PREFIX}{jti}", "1", ex=ttl)

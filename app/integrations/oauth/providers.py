@@ -1,11 +1,3 @@
-"""OAuth2 / OIDC client registry for social login (Google, Microsoft).
-
-Authlib handles the OIDC dance. The router (app/modules/auth) calls
-`oauth.<provider>.authorize_redirect(...)` then `authorize_access_token(...)`,
-reads the verified userinfo, and either links to or provisions a local User with
-``auth_provider`` set accordingly. Local password login stays independent.
-"""
-
 from __future__ import annotations
 
 from authlib.integrations.starlette_client import OAuth

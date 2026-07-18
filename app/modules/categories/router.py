@@ -1,5 +1,3 @@
-"""Category endpoints — CRUD following the customers template."""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status

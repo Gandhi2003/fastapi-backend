@@ -1,5 +1,3 @@
-"""Custom SQLAlchemy column types shared across models."""
-
 from __future__ import annotations
 
 from enum import IntEnum
@@ -10,13 +8,6 @@ from sqlalchemy.types import TypeDecorator
 
 
 class IntEnumType(TypeDecorator[IntEnum]):
-    """Store a Python ``IntEnum`` as a SMALLINT column.
-
-    The database holds the integer (1, 2, 3, …) — nice and compact, and what you
-    see in pgAdmin — while Python always gets the enum member back, so app code
-    can use ``ResourceType.CUSTOMERS`` instead of a magic number.
-    """
-
     impl = SmallInteger
     cache_ok = True
 
@@ -27,7 +18,6 @@ class IntEnumType(TypeDecorator[IntEnum]):
     def process_bind_param(self, value: Any, dialect: Dialect) -> int | None:  # Python -> DB
         if value is None:
             return None
-        # Accept an enum member, or a raw int/str that names a valid member.
         return self._enum_cls(value).value
 
     def process_result_value(self, value: Any, dialect: Dialect) -> IntEnum | None:  # DB -> Python

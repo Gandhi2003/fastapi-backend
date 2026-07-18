@@ -1,10 +1,3 @@
-"""Health & readiness probes for Kubernetes / load balancers.
-
-  * /health/live    — liveness: process is up (no dependencies checked).
-  * /health/ready   — readiness: DB + Redis reachable; gate traffic on this.
-Separating the two prevents a transient DB blip from killing healthy pods.
-"""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends

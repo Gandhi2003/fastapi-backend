@@ -1,10 +1,3 @@
-"""Auth request/response DTOs (Pydantic v2).
-
-Schemas are the API contract. They never expose ORM models directly — this keeps
-the wire format decoupled from the database schema and prevents accidental
-leakage of sensitive columns (password hash, MFA secret).
-"""
-
 from __future__ import annotations
 
 from datetime import datetime

@@ -43,14 +43,12 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.APP_NAME,
         version="1.0.0",
-        docs_url="/docs",  # Swagger UI
-        redoc_url="/redoc",  # ReDoc
+        docs_url="/docs",
+        redoc_url="/redoc",
         openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
         lifespan=lifespan,
-        # Hide internal docs in production behind the gateway/SSO if required.
     )
 
-    # --- middleware (registered last runs first / outermost) -------------- #
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
@@ -59,7 +57,6 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["X-Request-ID"],
     )
-    # Signed cookie session — backs the OAuth state/nonce during the login dance.
     app.add_middleware(
         SessionMiddleware, secret_key=settings.SECRET_KEY, https_only=settings.is_production
     )
@@ -68,10 +65,8 @@ def create_app() -> FastAPI:
         app.add_middleware(PrometheusMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
 
-    # --- error handling --------------------------------------------------- #
     register_exception_handlers(app)
 
-    # --- routes ----------------------------------------------------------- #
     app.include_router(api_router, prefix=settings.API_V1_PREFIX)
     if settings.PROMETHEUS_ENABLED:
         app.add_route("/metrics", metrics_endpoint, include_in_schema=False)

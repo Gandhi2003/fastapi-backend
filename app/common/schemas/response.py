@@ -1,10 +1,3 @@
-"""Standard response envelope used by every endpoint.
-
-A single consistent shape across 100+ modules means frontend/mobile/partners
-write ONE response parser. `success` is always present; exactly one of `data`
-or `error` is populated. `meta` carries pagination and the request id.
-"""
-
 from __future__ import annotations
 
 from typing import Generic, TypeVar

@@ -1,5 +1,3 @@
-"""Permission service — manage the authorization atoms."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,8 +36,6 @@ class PermissionService:
     async def update(self, permission_id: int, payload: PermissionUpdate) -> Permission:
         permission = await self.get(permission_id)
         changes = payload.model_dump(exclude_unset=True)
-        # If resource or action changed, re-derive the integer code and make sure
-        # the new resource+action pair isn't already taken by another permission.
         if "resource" in changes or "action" in changes:
             resource = changes.get("resource", permission.resource)
             action = changes.get("action", permission.action)
@@ -56,5 +52,5 @@ class PermissionService:
 
     async def delete(self, permission_id: int) -> None:
         permission = await self.get(permission_id)
-        await self.repo.hard_delete(permission)  # no soft-delete on permissions
+        await self.repo.hard_delete(permission)
         await self.session.commit()

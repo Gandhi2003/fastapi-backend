@@ -1,11 +1,3 @@
-"""Customer entity — the reference template every domain module follows.
-
-A module is a self-contained vertical slice:
-    models.py → schemas.py → repository.py → service.py → router.py
-This co-location (vs. layer-first folders) is what keeps 100+ modules navigable:
-everything about "customers" lives in one folder.
-"""
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -24,9 +16,7 @@ class Customer(Base, IntPkMixin, TimestampMixin, SoftDeleteMixin):
     email: Mapped[str | None] = mapped_column(String(255), index=True, nullable=True)
     phone: Mapped[str | None] = mapped_column(String(40), nullable=True)
     company: Mapped[str | None] = mapped_column(String(200), index=True, nullable=True)
-    country: Mapped[str | None] = mapped_column(String(2), nullable=True)  # ISO-3166
-
-    # Ownership / multi-tenancy hook — index supports per-owner list queries.
+    country: Mapped[str | None] = mapped_column(String(2), nullable=True)
     owner_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("users.id", ondelete="SET NULL"), index=True
     )

@@ -1,5 +1,3 @@
-"""User admin DTOs. Never expose hashed_password / mfa_secret on the wire."""
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -37,7 +35,7 @@ class UserUpdate(BaseModel):
     password: str | None = Field(default=None, min_length=12, max_length=128)
     is_superuser: bool | None = None
     status: UserStatus | None = None
-    role_ids: list[int] | None = None  # replaces the full set when provided
+    role_ids: list[int] | None = None
 
     @field_validator("password")
     @classmethod

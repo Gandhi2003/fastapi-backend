@@ -1,5 +1,3 @@
-"""Dealer service — business rules for the dealer aggregate."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -1,5 +1,3 @@
-"""Shared enums used across modules."""
-
 from __future__ import annotations
 
 from enum import IntEnum, StrEnum
@@ -8,7 +6,7 @@ from enum import IntEnum, StrEnum
 class UserStatus(StrEnum):
     ACTIVE = "active"
     INACTIVE = "inactive"
-    PENDING = "pending"  # awaiting email verification
+    PENDING = "pending"
     SUSPENDED = "suspended"
 
 
@@ -19,12 +17,6 @@ class AuthProvider(StrEnum):
 
 
 class ResourceType(IntEnum):
-    """The protectable resources — one per CRUD module.
-
-    Stored as a SMALLINT in ``permissions.resource`` (1, 2, 3, …); the name↔number
-    mapping lives here. Add a new member (next free number) when you add a module.
-    """
-
     USERS = 1
     ROLES = 2
     PERMISSIONS = 3
@@ -37,8 +29,6 @@ class ResourceType(IntEnum):
 
 
 class ActionType(IntEnum):
-    """The operations a permission can grant. Stored as SMALLINT in ``permissions.action``."""
-
     CREATE = 1
     READ = 2
     UPDATE = 3
@@ -46,20 +36,10 @@ class ActionType(IntEnum):
 
 
 def build_permission_code(resource: ResourceType, action: ActionType) -> int:
-    """Deterministic integer code for a permission = resource*10 + action.
-
-    e.g. customers(4) + create(1) -> 41. Unique because action is always < 10.
-    This integer is what's stored in ``permissions.code``.
-    """
     return int(resource) * 10 + int(action)
 
 
 def parse_permission_code(code: str) -> int:
-    """Turn a readable "<resource>:<action>" string into its integer code.
-
-    e.g. "customers:create" -> 41. Used so route declarations can stay readable
-    (``require_permissions("customers:create")``) while the DB stores integers.
-    """
     resource_name, action_name = code.split(":")
     return build_permission_code(
         ResourceType[resource_name.upper()], ActionType[action_name.upper()]

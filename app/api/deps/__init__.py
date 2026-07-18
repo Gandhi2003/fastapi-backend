@@ -1,5 +1,3 @@
-"""Public dependency surface — import from here in routers."""
-
 from app.api.deps.auth import (
     get_auth_service,
     get_current_user,

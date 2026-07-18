@@ -1,14 +1,3 @@
-"""Typed application settings.
-
-Single source of truth for configuration. Values are loaded from environment
-variables (12-factor) and validated by Pydantic at startup, so a misconfigured
-container fails fast and loudly instead of erroring deep inside a request.
-
-`get_settings()` is cached: settings are read once per process and injected
-everywhere via FastAPI's dependency system, which keeps modules decoupled from
-`os.environ` and makes them trivial to override in tests.
-"""
-
 from __future__ import annotations
 
 from functools import lru_cache
@@ -29,7 +18,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- Application ---
     APP_NAME: str = "CRM Backend"
     ENVIRONMENT: Environment = "local"
     DEBUG: bool = False
@@ -38,7 +26,6 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: list[str] = ["localhost", "127.0.0.1"]
     CORS_ORIGINS: list[str] = []
 
-    # --- Database ---
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
@@ -48,14 +35,12 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 10
     DB_ECHO: bool = False
 
-    # --- Redis ---
     REDIS_HOST: str
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     CELERY_BROKER_DB: int = 1
     CELERY_RESULT_DB: int = 2
 
-    # --- JWT / Auth ---
     JWT_ALGORITHM: str = "RS256"
     JWT_PRIVATE_KEY_PATH: Path = Path("./keys/private.pem")
     JWT_PUBLIC_KEY_PATH: Path = Path("./keys/public.pem")
@@ -66,7 +51,6 @@ class Settings(BaseSettings):
     ACCOUNT_LOCKOUT_DURATION_MINUTES: int = 30
     MFA_ISSUER: str = "Wealthified CRM"
 
-    # --- OAuth ---
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
     MICROSOFT_CLIENT_ID: str = ""
@@ -74,47 +58,37 @@ class Settings(BaseSettings):
     MICROSOFT_TENANT_ID: str = "common"
     OAUTH_REDIRECT_BASE_URL: str = "http://localhost:8000"
 
-    # --- Email ---
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
     EMAIL_FROM: str = "no-reply@example.com"
 
-    # --- Object storage ---
     S3_ENDPOINT_URL: str = ""
     S3_ACCESS_KEY: str = ""
     S3_SECRET_KEY: str = ""
     S3_BUCKET: str = "uploads"
     S3_REGION: str = "us-east-1"
 
-    # --- Observability ---
     LOG_LEVEL: str = "INFO"
     LOG_JSON: bool = True
-    # File logging. Set LOG_FILE="" to log to stdout only (e.g. on Kubernetes,
-    # where the platform collects stdout). The directory is created on startup.
     LOG_FILE: str = "logs/api.log"
-    LOG_FILE_MAX_BYTES: int = 10 * 1024 * 1024  # rotate at 10 MB
-    LOG_FILE_BACKUP_COUNT: int = 5  # keep api.log + 5 rotated copies
+    LOG_FILE_MAX_BYTES: int = 10 * 1024 * 1024
+    LOG_FILE_BACKUP_COUNT: int = 5
     SENTRY_DSN: str = ""
     PROMETHEUS_ENABLED: bool = True
 
-    # --- Rate limiting ---
     RATE_LIMIT_DEFAULT: str = "200/minute"
     RATE_LIMIT_AUTH: str = "10/minute"
 
-    # ----------------------------------------------------------------------- #
-    # Derived values
-    # ----------------------------------------------------------------------- #
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT in ("staging", "production")
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def DATABASE_URL(self) -> PostgresDsn:
-        """Async DSN used by the app (asyncpg driver)."""
         return PostgresDsn.build(
             scheme="postgresql+asyncpg",
             username=self.POSTGRES_USER,
@@ -124,16 +98,15 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def SYNC_DATABASE_URL(self) -> str:
-        """Sync DSN used by Alembic migrations (psycopg driver)."""
         return (
             f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def REDIS_URL(self) -> RedisDsn:
         return RedisDsn.build(
@@ -143,12 +116,12 @@ class Settings(BaseSettings):
             path=str(self.REDIS_DB),
         )
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def CELERY_BROKER_URL(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.CELERY_BROKER_DB}"
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def CELERY_RESULT_BACKEND(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.CELERY_RESULT_DB}"
@@ -156,7 +129,6 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    """Cached accessor — instantiate once per process."""
     return Settings()
 
 

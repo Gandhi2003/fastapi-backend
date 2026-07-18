@@ -1,5 +1,3 @@
-"""Permission endpoints — manage RBAC permission atoms."""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status

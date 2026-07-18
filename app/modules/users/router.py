@@ -1,5 +1,3 @@
-"""User admin endpoints — manage staff accounts and their roles."""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status

@@ -1,9 +1,3 @@
-"""Customer repository. Inherits all CRUD/pagination/soft-delete from the base.
-
-Most modules need nothing more than this subclass; add methods only for
-entity-specific queries (e.g. full-text search, owner-scoped lists).
-"""
-
 from __future__ import annotations
 
 from sqlalchemy import or_
@@ -19,7 +13,6 @@ class CustomerRepository(BaseRepository[Customer]):
         super().__init__(Customer, session)
 
     async def search(self, term: str, params: PageParams) -> Page[Customer]:
-        """Case-insensitive search across name/email/company."""
         like = f"%{term}%"
         base = self._base_query().where(
             or_(

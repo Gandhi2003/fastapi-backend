@@ -5,43 +5,35 @@ description = "Enterprise CRM backend — FastAPI, SQLAlchemy 2.0 async, Postgre
 requires-python = ">=3.13"
 readme = "README.md"
 
-# Runtime dependencies. Pinned by major; lock exact versions with `uv lock` / `pip-compile`.
 dependencies = [
-    # --- Web framework ---
     "fastapi>=0.115",
     "uvicorn[standard]>=0.34",
-    "gunicorn>=23.0",            # process manager in front of uvicorn workers in prod
-    # --- Validation / settings ---
+    "gunicorn>=23.0",          
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "email-validator>=2.2",
-    # --- Database ---
     "sqlalchemy[asyncio]>=2.0.36",
-    "asyncpg>=0.30",            # async PostgreSQL driver
+    "asyncpg>=0.30",          
     "alembic>=1.14",
-    "psycopg[binary]>=3.2",     # sync driver, used by Alembic offline / scripts
-    # --- Cache / broker ---
+    "psycopg[binary]>=3.2",    
     "redis[hiredis]>=5.2",
     "celery>=5.4",
-    "flower>=2.0",              # Celery monitoring UI
-    # --- Security ---
-    "argon2-cffi>=23.1",        # Argon2id password hashing
-    "pyjwt[crypto]>=2.10",      # JWT (RS256/HS256)
-    "pyotp>=2.9",               # TOTP MFA
-    "authlib>=1.4",             # OAuth2 clients (Google, Microsoft)
-    "itsdangerous>=2.2",        # signed tokens (email verification, CSRF)
-    "bleach>=6.2",              # HTML/XSS input sanitization
-    # --- Observability ---
-    "structlog>=24.4",          # structured JSON logging
+    "flower>=2.0",            
+    "argon2-cffi>=23.1",       
+    "pyjwt[crypto]>=2.10",     
+    "pyotp>=2.9",              
+    "authlib>=1.4",            
+    "itsdangerous>=2.2",       
+    "bleach>=6.2",            
+    "structlog>=24.4",        
     "prometheus-client>=0.21",
     "sentry-sdk[fastapi]>=2.19",
     "opentelemetry-instrumentation-fastapi>=0.50b0",
-    # --- Misc ---
-    "httpx>=0.28",              # async HTTP client (OAuth, webhooks)
-    "tenacity>=9.0",            # retries with backoff
-    "slowapi>=0.1.9",           # rate limiting helper (Redis backed)
-    "python-multipart>=0.0.18", # file uploads / form parsing
-    "boto3>=1.35",              # S3-compatible object storage
+    "httpx>=0.28",           
+    "tenacity>=9.0",          
+    "slowapi>=0.1.9",          
+    "python-multipart>=0.0.18", 
+    "boto3>=1.35",            
 ]
 
 [project.optional-dependencies]
@@ -57,7 +49,7 @@ dev = [
     "mypy>=1.14",
     "types-redis",
     "pre-commit>=4.0",
-    "asgi-lifespan>=2.1",       # lifespan in tests
+    "asgi-lifespan>=2.1",      
 ]
 
 [build-system]
@@ -67,9 +59,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
 
-# --------------------------------------------------------------------------- #
-# Ruff — linter + import sorter (replaces flake8, isort, pyupgrade, etc.)
-# --------------------------------------------------------------------------- #
 [tool.ruff]
 target-version = "py313"
 line-length = 100
@@ -91,23 +80,21 @@ select = [
     "RUF",
 ]
 ignore = [
-    "S101",   # allow assert in tests
-    "UP046",  # PEP 695 generic classes — kept as Generic[T] for pydantic-generic clarity
-    "UP047",  # PEP 695 generic functions — same rationale
+    "S101",  
+    "UP046",  
+    "UP047",  
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "ARG"]
 "app/db/migrations/**" = ["E501", "I"]
-"app/core/config.py" = ["N802"]              # computed settings fields use SCREAMING_CASE by convention
-"app/core/exceptions.py" = ["N818"]          # AppException is the intentional base-class name
-"app/modules/auth/schemas.py" = ["S105"]     # token_type="bearer" is a scheme name, not a secret
+"app/core/config.py" = ["N802"]              
+"app/core/exceptions.py" = ["N818"]         
+"app/modules/auth/schemas.py" = ["S105"]    
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
 
-# Depends()/require_permissions() in argument defaults is the idiomatic FastAPI
-# dependency-injection pattern — not a bugbear B008 violation.
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = [
     "fastapi.Depends",
@@ -123,16 +110,11 @@ extend-immutable-calls = [
     "app.api.deps.require_permissions",
 ]
 
-# --------------------------------------------------------------------------- #
-# Black — opinionated formatter (Ruff handles lint; Black owns formatting)
-# --------------------------------------------------------------------------- #
+
 [tool.black]
 line-length = 100
 target-version = ["py313"]
 
-# --------------------------------------------------------------------------- #
-# Mypy — strict static typing
-# --------------------------------------------------------------------------- #
 [tool.mypy]
 python_version = "3.13"
 strict = true
@@ -143,15 +125,11 @@ warn_unused_ignores = true
 ignore_missing_imports = true
 exclude = ["app/db/migrations/"]
 
-# Celery ships no type hints, so its task decorators are untyped. Allow them in
-# the workers package rather than scatter per-line ignores across every task.
 [[tool.mypy.overrides]]
 module = "app.workers.*"
 disallow_untyped_decorators = false
 
-# --------------------------------------------------------------------------- #
-# Pytest
-# --------------------------------------------------------------------------- #
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
@@ -168,6 +146,5 @@ source = ["app"]
 omit = ["app/db/migrations/*", "app/main.py"]
 
 [tool.coverage.report]
-# TODO: raise back to 80 as the test suite fills out (currently smoke tests only).
 fail_under = 0
 show_missing = true

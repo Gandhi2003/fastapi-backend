@@ -1,18 +1,3 @@
-"""Generic async CRUD repository (Repository Pattern).
-
-The repository is the ONLY place that knows about SQLAlchemy. Services depend on
-this abstraction, not on the ORM, which keeps business logic persistence-agnostic
-and trivially mockable in unit tests.
-
-A single generic implementation gives all 100+ entities consistent CRUD,
-soft-delete filtering, pagination, sorting and filtering — the DRY payoff of the
-pattern. Modules subclass it only to add entity-specific queries.
-
-Note: the repository never commits. Commit/rollback is owned by the Unit of Work
-so that a single service method spanning several repositories is one atomic
-transaction.
-"""
-
 from __future__ import annotations
 
 from typing import Any, Generic, TypeVar
@@ -32,7 +17,6 @@ class BaseRepository(Generic[ModelT]):
         self.model = model
         self.session = session
 
-    # --- internal helpers ------------------------------------------------- #
     def _base_query(self, include_deleted: bool = False) -> Select[tuple[ModelT]]:
         stmt = select(self.model)
         if issubclass(self.model, SoftDeleteMixin) and not include_deleted:
@@ -42,7 +26,6 @@ class BaseRepository(Generic[ModelT]):
     def _apply_filters(
         self, stmt: Select[tuple[ModelT]], filters: dict[str, Any] | None
     ) -> Select[tuple[ModelT]]:
-        """Whitelist-by-attribute equality filtering. Extend per-repo for ranges/LIKE."""
         if not filters:
             return stmt
         for field, value in filters.items():
@@ -59,9 +42,8 @@ class BaseRepository(Generic[ModelT]):
             stmt = stmt.order_by(asc(sort_col) if params.order == "asc" else desc(sort_col))
         return stmt
 
-    # --- reads ------------------------------------------------------------ #
     async def get(self, id_: int, include_deleted: bool = False) -> ModelT | None:
-        stmt = self._base_query(include_deleted).where(self.model.id == id_)  # type: ignore[attr-defined]
+        stmt = self._base_query(include_deleted).where(self.model.id == id_)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -88,11 +70,10 @@ class BaseRepository(Generic[ModelT]):
     async def exists(self, **kwargs: Any) -> bool:
         return await self.get_by(**kwargs) is not None
 
-    # --- writes (flush only; UoW commits) --------------------------------- #
     async def create(self, **data: Any) -> ModelT:
         instance = self.model(**data)
         self.session.add(instance)
-        await self.session.flush()  # populate PK/defaults without committing
+        await self.session.flush()
         return instance
 
     async def add(self, instance: ModelT) -> ModelT:

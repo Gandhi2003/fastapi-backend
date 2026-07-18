@@ -1,10 +1,3 @@
-"""Prometheus metrics + /metrics endpoint.
-
-Exposes RED metrics (Rate, Errors, Duration) per route. Scraped by Prometheus
-and visualised in Grafana. Cardinality is kept low by labelling on the route
-*template* (``/customers/{id}``) rather than the concrete path.
-"""
-
 from __future__ import annotations
 
 import time
@@ -30,7 +23,6 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         start = time.perf_counter()
         response = await call_next(request)
-        # Use the matched route template to bound label cardinality.
         route = request.scope.get("route")
         path = getattr(route, "path", request.url.path)
         elapsed = time.perf_counter() - start

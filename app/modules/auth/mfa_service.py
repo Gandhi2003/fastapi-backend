@@ -1,5 +1,3 @@
-"""TOTP-based multi-factor authentication helpers (RFC 6238 via pyotp)."""
-
 from __future__ import annotations
 
 import pyotp
@@ -12,10 +10,8 @@ def generate_secret() -> str:
 
 
 def provisioning_uri(secret: str, account_email: str) -> str:
-    """otpauth:// URI to render as a QR code in an authenticator app."""
     return pyotp.TOTP(secret).provisioning_uri(name=account_email, issuer_name=settings.MFA_ISSUER)
 
 
 def verify_code(secret: str, code: str) -> bool:
-    # valid_window=1 tolerates ~30s clock drift between server and device.
     return pyotp.TOTP(secret).verify(code, valid_window=1)

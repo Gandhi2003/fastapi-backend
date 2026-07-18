@@ -1,10 +1,3 @@
-"""User admin service — CRUD + role assignment for the users aggregate.
-
-Distinct from the auth *registration* flow: this is administrative user
-management (create staff, assign roles, suspend accounts). Admin-created users
-are activated and email-verified immediately so they can sign in.
-"""
-
 from __future__ import annotations
 
 import builtins
@@ -45,7 +38,7 @@ class UserService:
             auth_provider=AuthProvider.LOCAL,
             status=payload.status,
             is_superuser=payload.is_superuser,
-            email_verified_at=datetime.now(UTC),  # admin-created → pre-verified
+            email_verified_at=datetime.now(UTC),
         )
         user.roles = await self._resolve_roles(payload.role_ids)
         await self.repo.add(user)
@@ -59,7 +52,6 @@ class UserService:
         return user
 
     async def list(self, params: PageParams) -> Page[User]:
-        # User.roles is lazy="selectin", so list rows arrive with roles loaded.
         return await self.repo.list(params)
 
     async def update(self, user_id: int, payload: UserUpdate) -> User:
@@ -86,7 +78,6 @@ class UserService:
         await self.repo.soft_delete(user)
         await self.session.commit()
 
-    # --- helpers ---------------------------------------------------------- #
     async def _resolve_roles(self, role_ids: builtins.list[int]) -> builtins.list[Role]:
         if not role_ids:
             return []
