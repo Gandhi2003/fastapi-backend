@@ -1,14 +1,3 @@
-"""Authentication & authorization dependencies (the DI heart of security).
-
-`get_current_user` runs on every protected route:
-  decode JWT → check Redis denylist → load user → build the CurrentUser principal.
-
-`require_permissions(...)` is a dependency *factory*: routes declare what they
-need (`Depends(require_permissions("customers:create"))`) and FastAPI enforces
-it before the handler runs. Wiring services here (not in handlers) keeps routes
-thin and makes every dependency individually overridable in tests.
-"""
-
 from __future__ import annotations
 
 from typing import Any
@@ -31,7 +20,6 @@ from app.modules.users.repository import UserRepository
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-# --- service factories (composition root for the request) ------------------ #
 def get_user_repository(session: AsyncSession = Depends(db_session)) -> UserRepository:
     return UserRepository(session)
 
@@ -50,7 +38,6 @@ def get_auth_service(
     return AuthService(users, tokens)
 
 
-# --- current user ---------------------------------------------------------- #
 async def get_current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
@@ -68,7 +55,6 @@ async def get_current_user(
     if await tokens.is_denylisted(payload["jti"]):
         raise TokenRevokedError()
 
-    # JWT "sub" is a string; user ids are now integers.
     try:
         user_id = int(payload["sub"])
     except (KeyError, ValueError) as exc:
@@ -78,7 +64,7 @@ async def get_current_user(
     if user is None or user.is_deleted:
         raise AuthenticationError("User no longer exists.")
 
-    request.state.user_id = str(user.id)  # for audit/logging
+    request.state.user_id = str(user.id)
     return CurrentUser(
         id=user.id,
         email=user.email,
@@ -88,14 +74,7 @@ async def get_current_user(
     )
 
 
-# --- permission enforcement (RBAC + permission-based) ---------------------- #
 def require_permissions(*required: str) -> Any:
-    """Dependency factory enforcing that the caller holds ALL given permissions.
-
-    Routes declare permissions with readable strings (``"customers:create"``);
-    those are converted to their integer codes here to compare against the user's
-    stored integer permission codes.
-    """
     required_codes = {parse_permission_code(code): code for code in required}
 
     async def _checker(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:

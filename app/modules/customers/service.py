@@ -1,12 +1,3 @@
-"""Customer service — business rules for the customer aggregate.
-
-Demonstrates the service pattern other modules copy:
-  * depends on the repository abstraction, not the ORM;
-  * commits via the session (request-scoped UoW) at the natural boundary;
-  * raises domain exceptions for not-found / conflicts;
-  * returns ORM entities (the router maps them to read schemas).
-"""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

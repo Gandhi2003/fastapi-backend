@@ -1,5 +1,3 @@
-"""Category entity — product categories (self-contained vertical slice)."""
-
 from __future__ import annotations
 
 from sqlalchemy import Boolean, String

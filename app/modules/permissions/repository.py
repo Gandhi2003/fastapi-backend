@@ -1,5 +1,3 @@
-"""Permission repository — generic CRUD plus id/code lookups for RBAC wiring."""
-
 from __future__ import annotations
 
 from collections.abc import Sequence

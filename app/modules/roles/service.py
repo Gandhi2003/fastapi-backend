@@ -1,5 +1,3 @@
-"""Role service — manage roles and their permission bundles."""
-
 from __future__ import annotations
 
 import builtins
@@ -42,7 +40,6 @@ class RoleService:
         return role
 
     async def list(self, params: PageParams) -> Page[Role]:
-        # Role.permissions is lazy="selectin", so list rows arrive with perms loaded.
         return await self.repo.list(params)
 
     async def update(self, role_id: int, payload: RoleUpdate) -> Role:
@@ -66,10 +63,9 @@ class RoleService:
         role = await self.get(role_id)
         if role.is_system:
             raise BadRequestError("System roles cannot be deleted.")
-        await self.repo.hard_delete(role)  # no soft-delete on roles
+        await self.repo.hard_delete(role)
         await self.session.commit()
 
-    # --- helpers ---------------------------------------------------------- #
     async def _resolve_permissions(
         self, permission_ids: builtins.list[int]
     ) -> builtins.list[Permission]:

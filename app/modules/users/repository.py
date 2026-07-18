@@ -1,5 +1,3 @@
-"""User repository — entity-specific queries on top of the generic CRUD base."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

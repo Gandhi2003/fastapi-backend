@@ -1,5 +1,3 @@
-"""Role repository — CRUD plus eager permission loading and id lookups."""
-
 from __future__ import annotations
 
 from collections.abc import Sequence

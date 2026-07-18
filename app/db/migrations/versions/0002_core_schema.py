@@ -1,17 +1,3 @@
-"""core schema: rbac, auth, and core CRM tables
-
-Revision ID: 0002_core_schema
-Revises: 0001_enable_extensions
-Create Date: 2026-06-28 00:00:00
-
-Creates the full baseline schema: permissions/roles/users (RBAC), refresh tokens
-& devices (auth), and the core CRM domain tables (customers, farmers, dealers,
-suppliers, categories, products).
-
-You can regenerate/extend this with autogenerate once the DB exists:
-    alembic revision --autogenerate -m "..."
-"""
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -25,12 +11,11 @@ down_revision: str | None = "0001_enable_extensions"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-UUID = postgresql.UUID(as_uuid=True)  # still used for refresh_tokens.family_id
+UUID = postgresql.UUID(as_uuid=True)
 _NOW = sa.text("now()")
 
 
 def _pk() -> sa.Column:
-    # Auto-incrementing BIGSERIAL primary key: 1, 2, 3, ...
     return sa.Column("id", sa.BigInteger, primary_key=True, autoincrement=True)
 
 
@@ -46,7 +31,6 @@ def _deleted_at() -> sa.Column:
 
 
 def upgrade() -> None:
-    # --- permissions ------------------------------------------------------- #
     op.create_table(
         "permissions",
         _pk(),
@@ -60,7 +44,6 @@ def upgrade() -> None:
     op.create_index("ix_permissions_resource", "permissions", ["resource"])
     op.create_index("ix_permissions_created_at", "permissions", ["created_at"])
 
-    # --- roles ------------------------------------------------------------- #
     op.create_table(
         "roles",
         _pk(),
@@ -72,7 +55,6 @@ def upgrade() -> None:
     op.create_index("ix_roles_name", "roles", ["name"], unique=True)
     op.create_index("ix_roles_created_at", "roles", ["created_at"])
 
-    # --- role_permissions (M2M) ------------------------------------------- #
     op.create_table(
         "role_permissions",
         sa.Column(
@@ -89,7 +71,6 @@ def upgrade() -> None:
         ),
     )
 
-    # --- users ------------------------------------------------------------- #
     op.create_table(
         "users",
         _pk(),
@@ -115,7 +96,6 @@ def upgrade() -> None:
     op.create_index("ix_users_created_at", "users", ["created_at"])
     op.create_index("ix_users_deleted_at", "users", ["deleted_at"])
 
-    # --- user_roles (M2M) -------------------------------------------------- #
     op.create_table(
         "user_roles",
         sa.Column(
@@ -132,7 +112,6 @@ def upgrade() -> None:
         ),
     )
 
-    # --- user_devices ------------------------------------------------------ #
     op.create_table(
         "user_devices",
         _pk(),
@@ -149,7 +128,6 @@ def upgrade() -> None:
     op.create_index("ix_user_devices_user_id", "user_devices", ["user_id"])
     op.create_index("ix_user_devices_created_at", "user_devices", ["created_at"])
 
-    # --- refresh_tokens ---------------------------------------------------- #
     op.create_table(
         "refresh_tokens",
         _pk(),
@@ -174,7 +152,6 @@ def upgrade() -> None:
     op.create_index("ix_refresh_tokens_family_id", "refresh_tokens", ["family_id"])
     op.create_index("ix_refresh_tokens_created_at", "refresh_tokens", ["created_at"])
 
-    # --- customers --------------------------------------------------------- #
     op.create_table(
         "customers",
         _pk(),
@@ -197,7 +174,6 @@ def upgrade() -> None:
     op.create_index("ix_customers_created_at", "customers", ["created_at"])
     op.create_index("ix_customers_deleted_at", "customers", ["deleted_at"])
 
-    # --- categories -------------------------------------------------------- #
     op.create_table(
         "categories",
         _pk(),
@@ -211,7 +187,6 @@ def upgrade() -> None:
     op.create_index("ix_categories_created_at", "categories", ["created_at"])
     op.create_index("ix_categories_deleted_at", "categories", ["deleted_at"])
 
-    # --- products ---------------------------------------------------------- #
     op.create_table(
         "products",
         _pk(),
@@ -237,7 +212,6 @@ def upgrade() -> None:
     op.create_index("ix_products_created_at", "products", ["created_at"])
     op.create_index("ix_products_deleted_at", "products", ["deleted_at"])
 
-    # --- farmers ----------------------------------------------------------- #
     op.create_table(
         "farmers",
         _pk(),
@@ -263,7 +237,6 @@ def upgrade() -> None:
     op.create_index("ix_farmers_created_at", "farmers", ["created_at"])
     op.create_index("ix_farmers_deleted_at", "farmers", ["deleted_at"])
 
-    # --- dealers ----------------------------------------------------------- #
     op.create_table(
         "dealers",
         _pk(),
@@ -287,7 +260,6 @@ def upgrade() -> None:
     op.create_index("ix_dealers_created_at", "dealers", ["created_at"])
     op.create_index("ix_dealers_deleted_at", "dealers", ["deleted_at"])
 
-    # --- suppliers --------------------------------------------------------- #
     op.create_table(
         "suppliers",
         _pk(),

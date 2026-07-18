@@ -1,5 +1,3 @@
-"""Customer DTOs. Separate Create / Update / Read schemas = explicit contracts."""
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -16,7 +14,6 @@ class CustomerCreate(BaseModel):
 
 
 class CustomerUpdate(BaseModel):
-    # All optional → PATCH semantics; only provided fields are updated.
     name: str | None = Field(default=None, min_length=1, max_length=200)
     email: EmailStr | None = None
     phone: str | None = Field(default=None, max_length=40)

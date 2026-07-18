@@ -1,11 +1,3 @@
-"""Auth service — orchestrates the authentication use-cases.
-
-This is the Service Layer: it contains business rules and coordinates
-repositories, the token service, hashing, MFA and side-effects (emails via
-Celery). It depends only on abstractions (repositories, services) and raises
-domain exceptions — it never touches FastAPI request/response objects.
-"""
-
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -111,5 +103,4 @@ class AuthService:
         await self.session.commit()
 
 
-# Pre-computed dummy Argon2 hash used to equalize timing for unknown users.
 _DUMMY_HASH = hash_password("dummy-password-for-timing-equalization")

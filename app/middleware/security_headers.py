@@ -1,16 +1,10 @@
-"""Security headers + body size guard middleware.
-
-Sets the baseline browser-hardening headers on every response (defence in depth;
-Nginx may also set some). Rejects oversized bodies early to blunt memory-DoS.
-"""
-
 from __future__ import annotations
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-MAX_BODY_BYTES = 10 * 1024 * 1024  # 10 MiB (file uploads use streaming endpoints)
+MAX_BODY_BYTES = 10 * 1024 * 1024
 
 SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",

@@ -1,10 +1,3 @@
-"""Auth HTTP endpoints. Thin controllers: validate → call service → wrap result.
-
-No business logic lives here. Each route declares its dependencies (services,
-current user, permissions); FastAPI resolves them. Responses use the standard
-envelope for consistency with the rest of the API.
-"""
-
 from __future__ import annotations
 
 import jwt
@@ -72,7 +65,6 @@ async def logout(
     tokens: TokenService = Depends(get_token_service),
     _: CurrentUser = Depends(get_current_user),
 ) -> ResponseEnvelope[dict[str, str]]:
-    # Denylist the presented access token immediately.
     auth_header = request.headers.get("authorization", "")
     token = auth_header.removeprefix("Bearer ").strip()
     claims = decode_token(token, expected_type="access")
@@ -87,7 +79,6 @@ async def me(user: CurrentUser = Depends(get_current_user)) -> ResponseEnvelope[
     return ok(user)
 
 
-# --- MFA ------------------------------------------------------------------- #
 @router.post("/mfa/setup")
 async def mfa_setup(
     user: CurrentUser = Depends(get_current_user),
@@ -96,7 +87,7 @@ async def mfa_setup(
     secret = mfa_service.generate_secret()
     db_user = await service.users.get(user.id)
     assert db_user is not None
-    await service.users.update(db_user, mfa_secret=secret)  # confirmed on verify
+    await service.users.update(db_user, mfa_secret=secret)
     await service.session.commit()
     uri = mfa_service.provisioning_uri(secret, user.email)
     return ok(MFASetupResponse(secret=secret, otpauth_uri=uri))

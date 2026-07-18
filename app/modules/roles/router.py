@@ -1,5 +1,3 @@
-"""Role endpoints — manage roles and assign permissions."""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status

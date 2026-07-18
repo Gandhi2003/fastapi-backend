@@ -1,14 +1,3 @@
-"""store permissions.code as an integer (resource*10 + action)
-
-Revision ID: 0005_permission_code_int
-Revises: 0004_perm_res_act_int
-Create Date: 2026-07-11 00:20:00
-
-Converts the string ``code`` ("customers:read") to an integer computed from the
-already-integer resource/action columns (4*10 + 2 = 42). Reversible: the string
-form is rebuilt from the resource/action numbers on downgrade.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -35,7 +24,6 @@ _ACTION = {1: "create", 2: "read", 3: "update", 4: "delete"}
 
 
 def upgrade() -> None:
-    # resource and action are already SMALLINT, so the integer code is just math.
     op.execute(
         "ALTER TABLE permissions ALTER COLUMN code TYPE integer USING (resource * 10 + action)"
     )

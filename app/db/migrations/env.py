@@ -1,9 +1,3 @@
-"""Alembic environment — async-aware, settings-driven.
-
-Imports the model registry so autogenerate sees every table, and pulls the DB URL
-from application settings so migrations and the app never drift apart.
-"""
-
 from __future__ import annotations
 
 import asyncio
@@ -16,7 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.core.config import settings
 from app.db.base import Base
-from app.db import models_registry  # noqa: F401  (registers all models)
+# from app.db import models_registry
 
 config = context.config
 config.set_main_option("sqlalchemy.url", str(settings.DATABASE_URL))

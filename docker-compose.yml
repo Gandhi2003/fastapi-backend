@@ -1,12 +1,5 @@
-# Local / staging stack. In production, Postgres & Redis are managed services and
-# the app/workers run on Kubernetes — but the topology mirrors this file.
 name: crm-backend
-
 services:
-  # One-shot schema migration. Runs to completion, then exits. The app/worker
-  # never run DDL themselves (a 4-worker gunicorn would race `upgrade head`),
-  # so this is the single writer that brings the DB to head before they start.
-  # In production (Kubernetes) this maps to an initContainer / pre-upgrade Job.
   migrate:
     build:
       context: .
@@ -85,7 +78,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    ports: ["5433:5432"]   # host 5433 -> container 5432 (host 5432 used by local postgres@14)
+    ports: ["5433:5432"]  
 
   redis:
     image: redis:7-alpine
@@ -99,10 +92,10 @@ services:
       retries: 5
     ports: ["6379:6379"]
 
-  # --- local-only support services ---
+
   mailpit:
     image: axllent/mailpit:latest
-    ports: ["1025:1025", "8025:8025"]   # SMTP / web UI
+    ports: ["1025:1025", "8025:8025"]  
 
   minio:
     image: minio/minio:latest

@@ -1,10 +1,3 @@
-"""Request context middleware: correlation id + access logging + timing.
-
-Assigns/propagates an `X-Request-ID` so a single request can be traced across
-logs, Sentry and downstream services. Binds it into the structlog contextvar so
-every log line in the request carries it automatically.
-"""
-
 from __future__ import annotations
 
 import time

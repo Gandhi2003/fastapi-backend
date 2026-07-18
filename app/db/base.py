@@ -1,13 +1,3 @@
-"""Declarative base + global metadata conventions.
-
-A consistent constraint-naming convention is essential for Alembic to generate
-stable, reversible migrations (otherwise Postgres auto-names indexes/constraints
-and autogenerate produces noisy, non-deterministic diffs).
-
-NOTE: every model module must be imported before `Base.metadata` is used for
-autogenerate. `app/db/models_registry.py` centralizes those imports.
-"""
-
 from __future__ import annotations
 
 from sqlalchemy import MetaData

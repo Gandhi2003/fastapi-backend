@@ -1,5 +1,3 @@
-"""Category service — business rules for the category aggregate."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

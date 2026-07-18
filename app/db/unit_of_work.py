@@ -1,14 +1,3 @@
-"""Unit of Work — owns the transaction boundary.
-
-A service method may touch several repositories (e.g. create a user, assign a
-role, write an audit log). The UoW guarantees they commit together or not at
-all. Repositories only `flush`; the UoW `commit`s on success and `rollback`s on
-any exception.
-
-Repositories are lazily attached to the UoW so a service reaches every aggregate
-through one object: `async with uow: await uow.users.create(...)`.
-"""
-
 from __future__ import annotations
 
 from types import TracebackType
@@ -19,12 +8,6 @@ from app.db.session import AsyncSessionLocal
 
 
 class UnitOfWork:
-    """Transaction-scoped aggregate of repositories.
-
-    Concrete UoWs (or a registry) wire up domain repositories as attributes.
-    Kept generic here; modules access repositories they need via composition.
-    """
-
     session: AsyncSession
 
     def __init__(
@@ -52,12 +35,7 @@ class UnitOfWork:
             await self.session.close()
 
     def _init_repositories(self) -> None:
-        """Override in a concrete UoW to attach domain repositories.
-
-        Example:
-            from app.modules.users.repository import UserRepository
-            self.users = UserRepository(session=self.session)
-        """
+        pass
 
     async def commit(self) -> None:
         await self.session.commit()

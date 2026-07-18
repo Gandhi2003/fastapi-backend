@@ -1,9 +1,3 @@
-"""Customer endpoints — the canonical CRUD router template (copy per module).
-
-Every route enforces a fine-grained permission via `require_permissions`. List
-responses include pagination metadata in the envelope's `meta`.
-"""
-
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status

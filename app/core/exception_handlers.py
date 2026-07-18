@@ -1,11 +1,3 @@
-"""Global exception handlers — the single place HTTP error responses are built.
-
-Registered on the FastAPI app at startup. Guarantees:
-  * every error leaves the API in the standard envelope shape;
-  * internal exceptions never leak stack traces or SQL to clients;
-  * everything is logged with the request id for correlation.
-"""
-
 from __future__ import annotations
 
 from fastapi import FastAPI, Request, status
@@ -40,7 +32,6 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def _validation_exc(request: Request, exc: RequestValidationError) -> JSONResponse:
-        # Pydantic produced structured field errors — surface them safely.
         return _envelope(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             "validation_error",
@@ -51,7 +42,6 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(IntegrityError)
     async def _integrity_exc(request: Request, exc: IntegrityError) -> JSONResponse:
-        # Unique/foreign-key violations → 409 without leaking the SQL.
         logger.warning("integrity_error", error=str(exc.orig))
         return _envelope(
             status.HTTP_409_CONFLICT,
@@ -62,7 +52,6 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _unhandled_exc(request: Request, exc: Exception) -> JSONResponse:
-        # Last line of defence — log full detail server-side, return opaque 500.
         logger.exception("unhandled_exception", error=str(exc))
         return _envelope(
             status.HTTP_500_INTERNAL_SERVER_ERROR,

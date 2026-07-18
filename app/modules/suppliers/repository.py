@@ -1,5 +1,3 @@
-"""Supplier repository — generic CRUD from the base."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

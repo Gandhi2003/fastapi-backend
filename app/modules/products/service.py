@@ -1,5 +1,3 @@
-"""Product service — business rules for the product aggregate."""
-
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession

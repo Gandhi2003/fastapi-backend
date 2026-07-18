@@ -1,9 +1,3 @@
-"""Reusable pagination, filtering and sorting query primitives.
-
-`PageParams` is injected into list endpoints via FastAPI `Depends`, giving every
-list route identical `?page=&page_size=&sort=&order=` semantics for free.
-"""
-
 from __future__ import annotations
 
 from typing import Generic, Literal, TypeVar
@@ -29,8 +23,6 @@ class PageParams(BaseModel):
 
 
 class Page(BaseModel, Generic[T]):
-    """In-repository paginated result; mapped into the response envelope's meta."""
-
     items: list[T]
     total: int
     page: int
@@ -40,4 +32,4 @@ class Page(BaseModel, Generic[T]):
     def total_pages(self) -> int:
         if self.page_size == 0:
             return 0
-        return (self.total + self.page_size - 1) // self.page_size
+        return self.total + self.page_size - 1
