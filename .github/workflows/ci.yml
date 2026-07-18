@@ -3,14 +3,16 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
+  workflow_dispatch:
+    permissions:
+    id-token: write
+    contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # --- Static quality gate: lint + format + types -------------------------- #
   quality:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +31,6 @@ jobs:
       - name: Mypy (types)
         run: mypy app
 
-  # --- Tests against real Postgres + Redis service containers --------------- #
   test:
     runs-on: ubuntu-latest
     needs: quality
@@ -73,7 +74,6 @@ jobs:
           name: coverage
           path: coverage.xml
 
-  # --- Build & push image (only on main) ----------------------------------- #
   docker:
     runs-on: ubuntu-latest
     needs: test
